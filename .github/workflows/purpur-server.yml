@@ -1,38 +1,38 @@
 name: Minecraft Purpur Server Test
 
 on:
-  workflow_dispatch: # manuell auslösen
+  workflow_dispatch:  # manuell auslösen
 
 jobs:
   start-server:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      # 1. Repository auschecken
+      - uses: actions/checkout@v5
 
-      # 1. Java 21 installieren
-      - name: Install Java 21
-        run: |
-          sudo apt update
-          sudo apt install -y openjdk-21-jdk
-          java -version
+      # 2. Java 21 installieren
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
 
-      # 2. Arbeitsverzeichnis erstellen
+      # 3. Arbeitsverzeichnis erstellen
       - name: Create server directory
         run: mkdir -p $GITHUB_WORKSPACE/minecraft_server
 
-      # 3. Purpur Server herunterladen
+      # 4. Purpur Server herunterladen
       - name: Download Purpur 1.21.4 Build 2416
         run: |
           curl -L -o $GITHUB_WORKSPACE/minecraft_server/purpur.jar \
           https://api.purpurmc.org/v2/purpur/1.21.4/2416/download
 
-      # 4. EULA akzeptieren
+      # 5. EULA akzeptieren
       - name: Accept EULA
         run: echo "eula=true" > $GITHUB_WORKSPACE/minecraft_server/eula.txt
 
-      # 5. Server starten (nur für Testzwecke)
+      # 6. Server starten (nur für Testzwecke, max 2GB RAM auf GitHub Runner)
       - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
