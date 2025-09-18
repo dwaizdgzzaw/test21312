@@ -56,4 +56,4 @@ jobs:
       - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
-          java -Xmx2G -Xms1G -jar purpur.jar nogui
+          java -Xmx5G -Xms1G -jar purpur.jar nogui
