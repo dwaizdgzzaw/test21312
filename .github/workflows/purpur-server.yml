@@ -42,7 +42,7 @@ jobs:
 
       # 7. Playit.gg Agent starten (ohne Token)
       - name: Start Playit Agent
-        run: playit
+        run: playit &
 
       # 8. Minecraft Purpur Server starten
       - name: Start Minecraft Server
