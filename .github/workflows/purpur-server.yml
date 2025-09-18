@@ -1,4 +1,4 @@
-name: Minecraft Purpur Server mit ngrok
+name: Minecraft Purpur Server mit Serveo
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # 3. Arbeitsverzeichnis für den Server erstellen
+      # 3. Arbeitsverzeichnis für den Server
       - name: Create server directory
         run: mkdir -p $GITHUB_WORKSPACE/minecraft_server
 
@@ -32,28 +32,15 @@ jobs:
       - name: Accept EULA
         run: echo "eula=true" > $GITHUB_WORKSPACE/minecraft_server/eula.txt
 
-      # 6. ngrok installieren
-      - name: Install ngrok
+      # 6. Serveo TCP Tunnel starten
+      - name: Start Serveo Tunnel
         run: |
-          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | \
-            sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
-          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | \
-            sudo tee /etc/apt/sources.list.d/ngrok.list
-          sudo apt update && sudo apt install -y ngrok
-
-      # 7. ngrok mit hartkodiertem Token konfigurieren
-      - name: Authenticate ngrok
-        run: ngrok config add-authtoken 32tIlbkpBmAbcBAnhFMXQeyJQZd_5HmmRg8dLwKBgaWRefvTB
-
-      # 8. ngrok TCP Tunnel starten
-      - name: Start ngrok tunnel
-        run: |
-          nohup ngrok tcp 25565 --log=stdout > ngrok.log &
+          # Starte Serveo SSH Tunnel für Minecraft TCP-Port 25565
+          nohup ssh -o StrictHostKeyChecking=no -R 0:localhost:25565 serveo.net &
           sleep 5
-          echo "Ngrok tunnel URL:"
-          grep -o 'tcp://[0-9a-zA-Z\.\-:]*' ngrok.log
+          echo "Serveo tunnel läuft (siehe Logs für Hostname/Port)"
 
-      # 9. Minecraft Purpur Server starten
+      # 7. Minecraft Server starten
       - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
