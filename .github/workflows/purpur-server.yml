@@ -1,4 +1,4 @@
-name: Minecraft Purpur Server mit LocalTunnel
+name: Minecraft Purpur Server mit ngrok
 
 on:
   workflow_dispatch:
@@ -18,11 +18,11 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # 3. Arbeitsverzeichnis für den Server
+      # 3. Arbeitsverzeichnis für den Server erstellen
       - name: Create server directory
         run: mkdir -p $GITHUB_WORKSPACE/minecraft_server
 
-      # 4. Purpur 1.21.4 herunterladen
+      # 4. Purpur 1.21.4 Build 2416 herunterladen
       - name: Download Purpur Server
         run: |
           curl -L -o $GITHUB_WORKSPACE/minecraft_server/purpur.jar \
@@ -32,17 +32,28 @@ jobs:
       - name: Accept EULA
         run: echo "eula=true" > $GITHUB_WORKSPACE/minecraft_server/eula.txt
 
-      # 6. LocalTunnel installieren
-      - name: Install LocalTunnel
-        run: npm install -g localtunnel
-
-      # 7. LocalTunnel starten (Port 25565)
-      - name: Start LocalTunnel
+      # 6. ngrok installieren
+      - name: Install ngrok
         run: |
-          lt --port 25565 --print-requests &
-          sleep 5
+          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | \
+            sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | \
+            sudo tee /etc/apt/sources.list.d/ngrok.list
+          sudo apt update && sudo apt install -y ngrok
 
-      # 8. Minecraft Server starten
+      # 7. ngrok mit AuthToken konfigurieren
+      - name: Authenticate ngrok
+        run: ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+
+      # 8. ngrok TCP Tunnel starten
+      - name: Start ngrok tunnel
+        run: |
+          nohup ngrok tcp 25565 --log=stdout > ngrok.log &
+          sleep 5
+          echo "Ngrok tunnel URL:"
+          grep -o 'tcp://[0-9a-zA-Z\.\-:]*' ngrok.log
+
+      # 9. Minecraft Purpur Server starten
       - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
