@@ -41,9 +41,9 @@ jobs:
             sudo tee /etc/apt/sources.list.d/ngrok.list
           sudo apt update && sudo apt install -y ngrok
 
-      # 7. ngrok mit AuthToken konfigurieren
+      # 7. ngrok mit hartkodiertem Token konfigurieren
       - name: Authenticate ngrok
-        run: ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+        run: ngrok config add-authtoken 32tIlbkpBmAbcBAnhFMXQeyJQZd_5HmmRg8dLwKBgaWRefvTB
 
       # 8. ngrok TCP Tunnel starten
       - name: Start ngrok tunnel
