@@ -1,4 +1,4 @@
-name: Minecraft Purpur Server mit Playit Plugin und OP
+name: Minecraft Purpur Server mit Playit Plugin, OP und RAM-Abfrage
 
 on:
   workflow_dispatch:
@@ -52,8 +52,16 @@ jobs:
           ]
           EOL
 
-      # 8. Minecraft Server starten
+      # 8. RAM-Verfügbarkeit prüfen
+      - name: Check available RAM
+        run: |
+          echo "=== RAM Info ==="
+          free -h
+          echo "=== Memory in MB ==="
+          awk '/Mem:/ {print "Total: "$2" | Used: "$3" | Free: "$4" | Available: "$7}' /proc/meminfo
+
+      # 9. Minecraft Server starten
       - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
-          java -Xmx5G -Xms1G -jar purpur.jar nogui
+          java -Xmx2G -Xms1G -jar purpur.jar nogui
