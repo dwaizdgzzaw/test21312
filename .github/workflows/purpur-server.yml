@@ -1,4 +1,4 @@
-name: Minecraft Purpur Server mit Playit
+name: Minecraft Purpur Server mit LocalTunnel
 
 on:
   workflow_dispatch:
@@ -18,11 +18,11 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # 3. Arbeitsverzeichnis für Minecraft Server erstellen
+      # 3. Arbeitsverzeichnis für den Server
       - name: Create server directory
         run: mkdir -p $GITHUB_WORKSPACE/minecraft_server
 
-      # 4. Purpur 1.21.4 Build 2416 herunterladen
+      # 4. Purpur 1.21.4 herunterladen
       - name: Download Purpur Server
         run: |
           curl -L -o $GITHUB_WORKSPACE/minecraft_server/purpur.jar \
@@ -32,19 +32,17 @@ jobs:
       - name: Accept EULA
         run: echo "eula=true" > $GITHUB_WORKSPACE/minecraft_server/eula.txt
 
-      # 6. Playit.gg installieren
-      - name: Install Playit.gg
+      # 6. LocalTunnel installieren
+      - name: Install LocalTunnel
+        run: npm install -g localtunnel
+
+      # 7. LocalTunnel starten (Port 25565)
+      - name: Start LocalTunnel
         run: |
-          curl -SsL https://playit-cloud.github.io/ppa/key.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/playit.gpg >/dev/null
-          echo "deb [signed-by=/etc/apt/trusted.gpg.d/playit.gpg] https://playit-cloud.github.io/ppa/data ./" | sudo tee /etc/apt/sources.list.d/playit-cloud.list
-          sudo apt update
-          sudo apt install -y playit
+          lt --port 25565 --print-requests &
+          sleep 5
 
-      # 7. Playit.gg Agent starten (ohne Token)
-      - name: Start Playit Agent
-        run: playit &
-
-      # 8. Minecraft Purpur Server starten
+      # 8. Minecraft Server starten
       - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
