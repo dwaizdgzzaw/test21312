@@ -1,4 +1,4 @@
-name: Minecraft Purpur Server mit Serveo
+name: Minecraft Purpur Server mit Playit Plugin
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
 
       # 3. Arbeitsverzeichnis für den Server
       - name: Create server directory
-        run: mkdir -p $GITHUB_WORKSPACE/minecraft_server
+        run: mkdir -p $GITHUB_WORKSPACE/minecraft_server/plugins
 
       # 4. Purpur 1.21.4 Build 2416 herunterladen
       - name: Download Purpur Server
@@ -28,17 +28,15 @@ jobs:
           curl -L -o $GITHUB_WORKSPACE/minecraft_server/purpur.jar \
           https://api.purpurmc.org/v2/purpur/1.21.4/2416/download
 
-      # 5. EULA akzeptieren
+      # 5. Playit.gg Plugin herunterladen
+      - name: Download Playit Plugin
+        run: |
+          curl -L -o $GITHUB_WORKSPACE/minecraft_server/plugins/playit-minecraft-plugin.jar \
+          https://github.com/playit-cloud/playit-minecraft-plugin/releases/latest/download/playit-minecraft-plugin.jar
+
+      # 6. EULA akzeptieren
       - name: Accept EULA
         run: echo "eula=true" > $GITHUB_WORKSPACE/minecraft_server/eula.txt
-
-      # 6. Serveo TCP Tunnel starten
-      - name: Start Serveo Tunnel
-        run: |
-          # Starte Serveo SSH Tunnel für Minecraft TCP-Port 25565
-          nohup ssh -o StrictHostKeyChecking=no -R 0:localhost:25565 serveo.net &
-          sleep 5
-          echo "Serveo tunnel läuft (siehe Logs für Hostname/Port)"
 
       # 7. Minecraft Server starten
       - name: Start Minecraft Server
