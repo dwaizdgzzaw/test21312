@@ -1,4 +1,4 @@
-name: Minecraft Purpur Server mit Playit Plugin
+name: Minecraft Purpur Server mit Playit Plugin und OP
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # 3. Arbeitsverzeichnis für den Server
+      # 3. Arbeitsverzeichnis für den Server erstellen
       - name: Create server directory
         run: mkdir -p $GITHUB_WORKSPACE/minecraft_server/plugins
 
@@ -38,7 +38,21 @@ jobs:
       - name: Accept EULA
         run: echo "eula=true" > $GITHUB_WORKSPACE/minecraft_server/eula.txt
 
-      # 7. Minecraft Server starten
+      # 7. ops.json erstellen
+      - name: Add OP player
+        run: |
+          cat > $GITHUB_WORKSPACE/minecraft_server/ops.json <<EOL
+          [
+            {
+              "uuid": "f34b2cf3-af89-4012-87db-df6e2ab0d3aa",
+              "name": "NotJxlly",
+              "level": 4,
+              "bypassesPlayerLimit": false
+            }
+          ]
+          EOL
+
+      # 8. Minecraft Server starten
       - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
