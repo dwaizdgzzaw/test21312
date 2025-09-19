@@ -31,7 +31,7 @@ jobs:
       - name: Download Purpur Server
         run: |
           curl -L -o $GITHUB_WORKSPACE/minecraft_server/purpur.jar \
-          https://api.purpurmc.org/v2/purpur/1.21.4/2416/download
+          https://api.purpurmc.org/v2/purpur/1.21.8/2497/download
 
       # 5. Playit.gg Plugin herunterladen
       - name: Download Playit Plugin
