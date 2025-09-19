@@ -1,38 +1,39 @@
-name: Minecraft Purpur Server mit Repo-Sync und RAM-Limit
+name: Minecraft Purpur Server mit Playit Plugin, OP und Repo-Sync
 
 on:
   workflow_dispatch:
+
+permissions:
+  contents: write   # erlaubt github-actions, ins Repo zu pushen
 
 jobs:
   start-server:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Repo auschecken
+      # 1. Repository auschecken
       - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 2. Java installieren
+      # 2. Java 21 installieren
       - name: Setup Java 21
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
 
-      # 3. Arbeitsverzeichnis vorbereiten
+      # 3. Arbeitsverzeichnis für den Server erstellen
       - name: Create server directory
         run: mkdir -p $GITHUB_WORKSPACE/minecraft_server/plugins
 
-      # 4. Purpur-Server herunterladen, falls nicht vorhanden
+      # 4. Purpur 1.21.4 Build 2416 herunterladen
       - name: Download Purpur Server
         run: |
-          if [ ! -f "$GITHUB_WORKSPACE/minecraft_server/purpur.jar" ]; then
-            curl -L -o $GITHUB_WORKSPACE/minecraft_server/purpur.jar \
-            https://api.purpurmc.org/v2/purpur/1.21.4/2416/download
-          fi
+          curl -L -o $GITHUB_WORKSPACE/minecraft_server/purpur.jar \
+          https://api.purpurmc.org/v2/purpur/1.21.4/2416/download
 
-      # 5. Playit Plugin holen
+      # 5. Playit.gg Plugin herunterladen
       - name: Download Playit Plugin
         run: |
           curl -L -o $GITHUB_WORKSPACE/minecraft_server/plugins/playit-minecraft-plugin.jar \
@@ -42,11 +43,10 @@ jobs:
       - name: Accept EULA
         run: echo "eula=true" > $GITHUB_WORKSPACE/minecraft_server/eula.txt
 
-      # 7. OPs.json setzen (falls nicht vorhanden)
+      # 7. ops.json erstellen
       - name: Add OP player
         run: |
-          if [ ! -f "$GITHUB_WORKSPACE/minecraft_server/ops.json" ]; then
-            cat > $GITHUB_WORKSPACE/minecraft_server/ops.json <<EOL
+          cat > $GITHUB_WORKSPACE/minecraft_server/ops.json <<EOL
           [
             {
               "uuid": "f34b2cf3-af89-4012-87db-df6e2ab0d3aa",
@@ -56,27 +56,26 @@ jobs:
             }
           ]
           EOL
-          fi
 
-      # 8. RAM-Check
+      # 8. RAM-Verfügbarkeit prüfen
       - name: Check available RAM
         run: |
           echo "=== RAM Info ==="
           free -h
 
-      # 9. Server starten (max. 15 GB)
+      # 9. Minecraft Server starten (max 15 GB RAM)
       - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
-          java -Xmx15G -Xms1G -jar purpur.jar nogui
+          java -Xmx15G -Xms1G -jar purpur.jar nogui || true
 
-      # 10. Änderungen (z. B. Welt) ins Repo pushen
+      # 10. Änderungen zurück ins Repo committen
       - name: Save server data to repo
         run: |
           cd $GITHUB_WORKSPACE
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add minecraft_server
-          git commit -m "Auto-save Minecraft server data"
+          git commit -m "Auto-save Minecraft server data" || echo "No changes to commit"
           git push
         continue-on-error: true
