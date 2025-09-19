@@ -27,7 +27,7 @@ jobs:
       - name: Create server directory
         run: mkdir -p $GITHUB_WORKSPACE/minecraft_server/plugins
 
-      # 4. Purpur 1.21.4 Build 2416 herunterladen
+      # 4. Purpur 1.21.8 Build 2497 herunterladen
       - name: Download Purpur Server
         run: |
           curl -L -o $GITHUB_WORKSPACE/minecraft_server/purpur.jar \
@@ -69,13 +69,14 @@ jobs:
           cd $GITHUB_WORKSPACE/minecraft_server
           java -Xmx15G -Xms1G -jar purpur.jar nogui || true
 
-      # 10. Änderungen zurück ins Repo committen
-      - name: Save server data to repo
+      # 10. Änderungen zurück ins Repo committen und bedingungslos pushen
+      - name: Force-push server data to repo
         run: |
           cd $GITHUB_WORKSPACE
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add minecraft_server
+          git add -A minecraft_server
           git commit -m "Auto-save Minecraft server data" || echo "No changes to commit"
-          git push
-        continue-on-error: true
+          # Force push, um alle Konflikte zu ignorieren
+          git push origin HEAD:main --force
+        continue-on-error: false
