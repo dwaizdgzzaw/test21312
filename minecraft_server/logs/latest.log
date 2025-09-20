@@ -103,3 +103,5 @@ java.net.SocketException: Connection reset
 [09:56:49] [User Authenticator #0/INFO]: UUID of player NotJxlly is f34b2cf3-af89-4012-87db-df6e2ab0d3aa
 [09:56:50] [Server thread/INFO]: NotJxlly joined the game
 [09:56:50] [Server thread/INFO]: NotJxlly[/127.0.0.1:55742] logged in with entity id 31 at ([world]-1161.0107083942091, 62.423264312744145, -699.5813269372894)
+[10:00:06] [Server thread/INFO]: NotJxlly issued server command: /schedule
+[10:00:13] [Server thread/INFO]: NotJxlly issued server command: /schedule function
