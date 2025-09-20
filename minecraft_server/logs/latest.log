@@ -166,3 +166,4 @@ java.net.SocketException: Connection reset
 [11:21:02] [Paper Async Task Handler Thread - 0/INFO]: https://spark.lucko.me/wUqb2ALcTL
 [11:21:02] [Paper Async Task Handler Thread - 0/INFO]: 
 [11:21:02] [Paper Async Task Handler Thread - 0/INFO]: (NOTE: this link is temporary and will expire after a short period of time. If you need a link to share with other people (e.g. in a bug report), please use /spark profiler stop instead.)
+[11:21:14] [WebSocketConnectReadThread-137/INFO]: [spark] [Viewer - D3R0Ge9naqUL4nS] Client connected: clientId=aaef-9b98, keyhash=12c4a5, desc=Chrome on Windows
