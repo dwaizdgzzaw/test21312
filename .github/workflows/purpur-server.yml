@@ -1,10 +1,10 @@
-name: Minecraft Purpur Server mit Playit Plugin, OP und Repo-Sync (sicher)
+name: Minecraft Purpur Server mit Autosave-Backup
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: write   # erlaubt github-actions, ins Repo zu pushen
+  contents: write   # GitHub Actions darf ins Repo pushen
 
 jobs:
   start-server:
@@ -23,47 +23,31 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # 3. RAM-Verfügbarkeit prüfen
-      - name: Check available RAM
-        run: |
-          echo "=== RAM Info ==="
-          free -h
-
-      # 4. Hilfsdatei: .gitignore für Lock-Files
-      - name: Setup .gitignore for volatile files
-        run: |
-          cat >> $GITHUB_WORKSPACE/.gitignore <<EOL
-          minecraft_server/world/session.lock
-          minecraft_server/world_nether/session.lock
-          minecraft_server/world_the_end/session.lock
-          EOL
-
-      # 5. Minecraft Server starten (max 15 GB RAM) im Hintergrund
+      # 3. Minecraft Server starten (max 15 GB RAM) im Hintergrund
       - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
           java -Xmx15G -Xms1G -jar purpur.jar nogui &
           echo $! > server.pid
 
-      # 6. Kontinuierlich Welt sichern & ins Repo pushen
-      - name: Continuous backup loop
+      # 4. Kontinuierlich Autosave-Ordner erstellen und pushen
+      - name: Continuous autosave backup
         run: |
           while kill -0 $(cat minecraft_server/server.pid) 2>/dev/null; do
-            echo "=== Backup Loop ==="
+            echo "=== Autosave Backup Loop ==="
 
-            # Welt kopieren (sauber)
-            rsync -a --delete minecraft_server/world/ backup_world/world/
-            rsync -a --delete minecraft_server/world_nether/ backup_world/world_nether/
-            rsync -a --delete minecraft_server/world_the_end/ backup_world/world_the_end/
+            # Kopiere die Welt-Ordner in autosave-Verzeichnisse
+            rsync -a --delete minecraft_server/world/ $GITHUB_WORKSPACE/autosave-world/
+            rsync -a --delete minecraft_server/world_nether/ $GITHUB_WORKSPACE/autosave-world_nether/
+            rsync -a --delete minecraft_server/world_the_end/ $GITHUB_WORKSPACE/autosave-world_the_end/
 
-            # Push ins Repo erzwingen
+            # Commit & push der Autosave-Ordner
             cd $GITHUB_WORKSPACE
             git config user.name "github-actions"
             git config user.email "github-actions@github.com"
-            git add backup_world || true
-            git commit -m "Auto-backup world $(date)" || true
+            git add autosave-world autosave-world_nether autosave-world_the_end || true
+            git commit -m "Autosave backup $(date)" || true
             git push --force || true
 
-            cd $GITHUB_WORKSPACE
-            sleep 60   # jede Minute sichern
+            sleep 60  # jede Minute
           done
