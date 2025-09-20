@@ -1,17 +1,17 @@
-name: Minecraft Purpur Server Auto-Save & Repo Sync
+name: Minecraft Purpur Server Repo-Sync Force Direct
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: write   # erlaubt github-actions, ins Repo zu pushen
+  contents: write
 
 jobs:
   start-server:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Repository auschecken – immer das komplette Repo
+      # 1. Repository auschecken
       - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -42,33 +42,25 @@ jobs:
           java -Xmx15G -Xms1G -jar purpur.jar nogui &
           echo $! > server.pid
 
-      # 5. Kontinuierlich Force Push mit Save-All
-      - name: Continuous Save-All & Force Push
+      # 5. Kontinuierlich Force Push direkt in minecraft_server/
+      - name: Continuous force push Minecraft server
         run: |
           while kill -0 $(cat minecraft_server/server.pid) 2>/dev/null; do
-            echo "=== Save-All & Force Push Loop ==="
+            echo "=== Force Push Loop ==="
 
-            cd $GITHUB_WORKSPACE/minecraft_server
-
-            # 1. Save-All ausführen über den Server
-            if [ -f server.pid ]; then
-              echo "save-all" | nc -U minecraft_server/server.pipe || echo "Save-All failed, ignored"
-              sleep 5 # kurz warten, dass alles geschrieben wird
-            fi
-
-            # 2. Git vorbereiten
+            # Git vorbereiten
             cd $GITHUB_WORKSPACE
             git config user.name "github-actions"
             git config user.email "github-actions@github.com"
 
-            # 3. Alle Dateien hinzufügen, temporäre Dateien ignorieren
+            # Alle Dateien aus dem laufenden Server-Ordner hinzufügen, temporäre Dateien ignorieren
             rsync -a --ignore-errors --exclude='*.tmp' --exclude='session.lock' minecraft_server/ minecraft_server/
 
-            # 4. Commit & Force Push
+            # Git commit & Force Push
             git add -A minecraft_server || true
-            git commit -m "Auto Save-All backup $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+            git commit -m "Force push Minecraft server data $(date)" || echo "No changes to commit"
             git push origin HEAD:main --force || echo "Push failed, ignored"
 
-            # 5. 60 Sekunden warten
+            # 60 Sekunden warten
             sleep 60
           done
