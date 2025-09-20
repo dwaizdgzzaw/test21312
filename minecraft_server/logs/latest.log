@@ -209,3 +209,7 @@ java.net.SocketException: Connection reset
 [09:45:49] [Server thread/INFO]: NotJxlly[/127.0.0.1:34468] logged in with entity id 31 at ([world]-1145.5, 62.0, -513.5)
 [09:46:08] [Server thread/INFO]: NotJxlly issued server command: /gamerule logAdminCommands
 [09:46:14] [Server thread/INFO]: NotJxlly issued server command: /gamerule logAdminCommands false
+[09:46:19] [Server thread/INFO]: NotJxlly issued server command: /gamerule logAdminCommands true
+[09:46:19] [Server thread/INFO]: [NotJxlly: Gamerule logAdminCommands is now set to: true]
+[09:46:42] [Server thread/INFO]: NotJxlly issued server command: /save-all
+[09:46:43] [Server thread/INFO]: [NotJxlly: Saved the game]
