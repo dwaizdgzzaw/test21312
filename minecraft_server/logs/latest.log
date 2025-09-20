@@ -105,3 +105,5 @@ java.net.SocketException: Connection reset
 [09:56:50] [Server thread/INFO]: NotJxlly[/127.0.0.1:55742] logged in with entity id 31 at ([world]-1161.0107083942091, 62.423264312744145, -699.5813269372894)
 [10:00:06] [Server thread/INFO]: NotJxlly issued server command: /schedule
 [10:00:13] [Server thread/INFO]: NotJxlly issued server command: /schedule function
+[10:00:33] [Thread-5/INFO]: [gg.playit.control.ChannelSetup] send keep alive
+[10:00:45] [Thread-5/INFO]: [gg.playit.control.ChannelSetup] send keep alive
