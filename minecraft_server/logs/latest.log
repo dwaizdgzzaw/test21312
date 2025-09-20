@@ -129,3 +129,25 @@ java.net.SocketException: Connection reset
 [10:43:50] [Server thread/INFO]: NotJxlly issued server command: /save-on
 [10:47:01] [Thread-5/INFO]: [gg.playit.control.ChannelSetup] send keep alive
 [10:47:13] [Thread-5/INFO]: [gg.playit.control.ChannelSetup] send keep alive
+[10:48:29] [Server thread/INFO]: NotJxlly issued server command: /spark tickmonitor
+[10:48:29] [Server thread/INFO]: [⚡] Tick monitor started. Before the monitor becomes fully active, the server's average tick rate will be calculated over a period of 120 ticks (approx 6 seconds).
+[10:48:35] [Paper Async Task Handler Thread - 0/INFO]: [⚡] Analysis is now complete.
+[10:48:35] [Paper Async Task Handler Thread - 0/INFO]: [⚡] > Max: 50.03ms
+[10:48:35] [Paper Async Task Handler Thread - 0/INFO]: [⚡] > Min: 49.96ms
+[10:48:35] [Paper Async Task Handler Thread - 0/INFO]: [⚡] > Average: 50ms
+[10:48:35] [Paper Async Task Handler Thread - 0/INFO]: [⚡] Starting now, any ticks with >100.0% increase in duration compared to the average will be reported.
+[10:48:39] [Paper Async Task Handler Thread - 1/INFO]: [⚡] Tick #209 included GC lasting 5 ms. (type = Young Gen)
+[10:48:40] [Paper Async Task Handler Thread - 0/INFO]: [⚡] Tick #220 included GC lasting 7 ms. (type = end of concurrent GC pause)
+[10:48:40] [Paper Async Task Handler Thread - 1/INFO]: [⚡] Tick #225 included GC lasting 0 ms. (type = end of concurrent GC pause)
+[10:48:44] [Paper Async Task Handler Thread - 0/INFO]: [⚡] Tick #296 included GC lasting 6 ms. (type = Young Gen)
+[10:48:48] [Paper Async Task Handler Thread - 1/INFO]: [⚡] Tick #385 included GC lasting 18 ms. (type = Young Gen)
+[10:48:52] [Paper Async Task Handler Thread - 0/INFO]: [⚡] Tick #473 included GC lasting 5 ms. (type = Young Gen)
+[10:48:53] [Paper Async Task Handler Thread - 1/INFO]: [⚡] Tick #484 included GC lasting 14 ms. (type = end of concurrent GC pause)
+[10:48:53] [Paper Async Task Handler Thread - 0/INFO]: [⚡] Tick #489 included GC lasting 0 ms. (type = end of concurrent GC pause)
+[10:48:57] [Paper Async Task Handler Thread - 1/INFO]: [⚡] Tick #558 included GC lasting 6 ms. (type = Young Gen)
+[10:49:01] [Paper Async Task Handler Thread - 0/INFO]: [⚡] Tick #636 included GC lasting 9 ms. (type = Young Gen)
+[10:49:04] [Paper Async Task Handler Thread - 1/INFO]: [⚡] Tick #711 included GC lasting 6 ms. (type = Young Gen)
+[10:49:05] [Paper Async Task Handler Thread - 0/INFO]: [⚡] Tick #722 included GC lasting 6 ms. (type = end of concurrent GC pause)
+[10:49:05] [Paper Async Task Handler Thread - 1/INFO]: [⚡] Tick #727 included GC lasting 0 ms. (type = end of concurrent GC pause)
+[10:49:06] [Server thread/INFO]: NotJxlly issued server command: /spark tickmonitor
+[10:49:06] [Paper Async Task Handler Thread - 0/INFO]: [⚡] Tick monitor disabled.
