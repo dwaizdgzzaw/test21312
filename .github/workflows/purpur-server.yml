@@ -1,4 +1,4 @@
-name: Minecraft Purpur Server Repo-Sync
+name: Minecraft Purpur Server mit Playit Plugin, OP und Repo-Sync
 
 on:
   workflow_dispatch:
@@ -11,18 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Repository auschecken – immer das komplette Repo
+      # 1. Repository auschecken (immer neueste Dateien holen)
       - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
-          persist-credentials: true
-
-      # 1b. Force-reset, um sicher auf den neuesten Stand zu kommen
-      - name: Reset to latest
-        run: |
-          git fetch origin main
-          git reset --hard origin/main
 
       # 2. Java 21 installieren
       - name: Setup Java 21
@@ -33,20 +26,32 @@ jobs:
 
       # 3. RAM-Verfügbarkeit prüfen
       - name: Check available RAM
-        run: free -h
+        run: |
+          echo "=== RAM Info ==="
+          free -h
 
-      # 4. Minecraft Server starten (max 15 GB RAM)
-      - name: Start Minecraft Server
+      # 4. Minecraft Server starten + Auto-Save-Schleife
+      - name: Start server with auto-save loop
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
-          java -Xmx15G -Xms1G -jar purpur.jar nogui || true
 
-      # 5. Änderungen zurück ins Repo committen und bedingungslos pushen
-      - name: Force-push server data to repo
-        run: |
-          cd $GITHUB_WORKSPACE
+          # Server im Hintergrund starten
+          java -Xmx15G -Xms1G -jar purpur.jar nogui &
+          SERVER_PID=$!
+
+          echo "Minecraft-Server gestartet mit PID $SERVER_PID"
+
+          # Git konfigurieren
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add -A minecraft_server
-          git commit -m "Auto-save Minecraft server data" || echo "No changes to commit"
-          git push origin HEAD:main --force
+
+          # Auto-Save-Schleife
+          while kill -0 $SERVER_PID 2>/dev/null; do
+            git add .
+            git commit -m "Auto-save at $(date)" || true
+            git push --force
+            echo "Auto-save durchgeführt."
+            sleep 60
+          done
+
+          echo "Minecraft-Server beendet, Auto-Save-Schleife gestoppt."
