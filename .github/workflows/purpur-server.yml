@@ -1,4 +1,4 @@
-name: Minecraft Purpur Server mit Playit Plugin, OP und Repo-Sync
+name: Minecraft Purpur Server mit Playit Plugin, OP und Repo-Sync (sicher)
 
 on:
   workflow_dispatch:
@@ -11,11 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Repository auschecken (immer neueste Dateien holen)
+      # 1. Repository auschecken
       - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
 
       # 2. Java 21 installieren
       - name: Setup Java 21
@@ -30,28 +29,41 @@ jobs:
           echo "=== RAM Info ==="
           free -h
 
-      # 4. Minecraft Server starten + Auto-Save-Schleife
-      - name: Start server with auto-save loop
+      # 4. Hilfsdatei: .gitignore für Lock-Files
+      - name: Setup .gitignore for volatile files
+        run: |
+          cat >> $GITHUB_WORKSPACE/.gitignore <<EOL
+          minecraft_server/world/session.lock
+          minecraft_server/world_nether/session.lock
+          minecraft_server/world_the_end/session.lock
+          EOL
+
+      # 5. Minecraft Server starten (max 15 GB RAM) im Hintergrund
+      - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
-
-          # Server im Hintergrund starten
           java -Xmx15G -Xms1G -jar purpur.jar nogui &
-          SERVER_PID=$!
+          echo $! > server.pid
 
-          echo "Minecraft-Server gestartet mit PID $SERVER_PID"
+      # 6. Kontinuierlich Welt sichern & ins Repo pushen
+      - name: Continuous backup loop
+        run: |
+          while kill -0 $(cat minecraft_server/server.pid) 2>/dev/null; do
+            echo "=== Backup Loop ==="
 
-          # Git konfigurieren
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+            # Welt kopieren (sauber)
+            rsync -a --delete minecraft_server/world/ backup_world/world/
+            rsync -a --delete minecraft_server/world_nether/ backup_world/world_nether/
+            rsync -a --delete minecraft_server/world_the_end/ backup_world/world_the_end/
 
-          # Auto-Save-Schleife
-          while kill -0 $SERVER_PID 2>/dev/null; do
-            git add .
-            git commit -m "Auto-save at $(date)" || true
-            git push --force
-            echo "Auto-save durchgeführt."
-            sleep 60
+            # Push ins Repo erzwingen
+            cd $GITHUB_WORKSPACE
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git add backup_world || true
+            git commit -m "Auto-backup world $(date)" || true
+            git push --force || true
+
+            cd $GITHUB_WORKSPACE
+            sleep 60   # jede Minute sichern
           done
-
-          echo "Minecraft-Server beendet, Auto-Save-Schleife gestoppt."
