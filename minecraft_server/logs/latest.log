@@ -169,3 +169,7 @@ java.net.SocketException: Connection reset
 [11:21:14] [WebSocketConnectReadThread-137/INFO]: [spark] [Viewer - D3R0Ge9naqUL4nS] Client connected: clientId=aaef-9b98, keyhash=12c4a5, desc=Chrome on Windows
 [11:24:11] [Thread-5/INFO]: [gg.playit.control.ChannelSetup] send keep alive
 [11:24:23] [Thread-5/INFO]: [gg.playit.control.ChannelSetup] send keep alive
+[11:28:02] [Server thread/INFO]: NotJxlly issued server command: /ram
+[11:28:07] [spark-async-sampler-worker-thread/INFO]: [spark] [Viewer - D3R0Ge9naqUL4nS] No clients have pinged for 30s, closing socket
+[11:28:12] [Thread-5/INFO]: [gg.playit.control.ChannelSetup] send keep alive
+[11:28:24] [Thread-5/INFO]: [gg.playit.control.ChannelSetup] send keep alive
