@@ -102,3 +102,5 @@ java.net.SocketException: Connection reset
 [09:51:52] [User Authenticator #0/INFO]: UUID of player NotJxlly is f34b2cf3-af89-4012-87db-df6e2ab0d3aa
 [09:51:53] [Server thread/INFO]: NotJxlly joined the game
 [09:51:53] [Server thread/INFO]: NotJxlly[/127.0.0.1:38388] logged in with entity id 31 at ([world]-1168.2708432140575, 70.0, -515.3000000119209)
+[09:53:39] [Server thread/INFO]: NotJxlly issued server command: /save-all
+[09:53:40] [Server thread/INFO]: [NotJxlly: Saved the game]
