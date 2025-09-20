@@ -1,10 +1,10 @@
-name: Minecraft Purpur Server mit Autosave-Backup
+name: Minecraft Purpur Server Repo-Sync Force Direct
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: write   # GitHub Actions darf ins Repo pushen
+  contents: write
 
 jobs:
   start-server:
@@ -15,6 +15,14 @@ jobs:
       - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      # 1b. Force-reset auf neuesten Stand
+      - name: Reset to latest
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
 
       # 2. Java 21 installieren
       - name: Setup Java 21
@@ -23,31 +31,36 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # 3. Minecraft Server starten (max 15 GB RAM) im Hintergrund
+      # 3. RAM prüfen
+      - name: Check available RAM
+        run: free -h
+
+      # 4. Minecraft Server starten (max 15 GB RAM) im Hintergrund
       - name: Start Minecraft Server
         run: |
           cd $GITHUB_WORKSPACE/minecraft_server
           java -Xmx15G -Xms1G -jar purpur.jar nogui &
           echo $! > server.pid
 
-      # 4. Kontinuierlich Autosave-Ordner erstellen und pushen
-      - name: Continuous autosave backup
+      # 5. Kontinuierlich Force Push direkt in minecraft_server/
+      - name: Continuous force push Minecraft server
         run: |
           while kill -0 $(cat minecraft_server/server.pid) 2>/dev/null; do
-            echo "=== Autosave Backup Loop ==="
+            echo "=== Force Push Loop ==="
 
-            # Kopiere die Welt-Ordner in autosave-Verzeichnisse
-            rsync -a --delete minecraft_server/world/ $GITHUB_WORKSPACE/autosave-world/
-            rsync -a --delete minecraft_server/world_nether/ $GITHUB_WORKSPACE/autosave-world_nether/
-            rsync -a --delete minecraft_server/world_the_end/ $GITHUB_WORKSPACE/autosave-world_the_end/
-
-            # Commit & push der Autosave-Ordner
+            # Git vorbereiten
             cd $GITHUB_WORKSPACE
             git config user.name "github-actions"
             git config user.email "github-actions@github.com"
-            git add autosave-world autosave-world_nether autosave-world_the_end || true
-            git commit -m "Autosave backup $(date)" || true
-            git push --force || true
 
-            sleep 60  # jede Minute
+            # Alle Dateien aus dem laufenden Server-Ordner hinzufügen, temporäre Dateien ignorieren
+            rsync -a --ignore-errors --exclude='*.tmp' --exclude='session.lock' minecraft_server/ minecraft_server/
+
+            # Git commit & Force Push
+            git add -A minecraft_server || true
+            git commit -m "Force push Minecraft server data $(date)" || echo "No changes to commit"
+            git push origin HEAD:main --force || echo "Push failed, ignored"
+
+            # 60 Sekunden warten
+            sleep 60
           done
